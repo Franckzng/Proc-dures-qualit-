@@ -1,0 +1,238 @@
+/* src/app/pages/procedures/procedure-detail/procedure-detail.component.css */
+.procedure-doc {
+  font-family: 'Times New Roman', serif;
+  line-height: 1.6;
+  color: #000;
+}
+
+.section-header h5 {
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 20px;
+  text-decoration: underline;
+}
+
+.operations-list {
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+/* Styles pour l'affichage hiérarchique des étapes */
+.operation-item {
+  margin-bottom: 6px;
+  position: relative;
+}
+
+.operation-item.level-0 {
+  margin-left: 0;
+}
+
+.operation-item.level-1 {
+  margin-left: 40px;
+}
+
+.operation-item.level-2 {
+  margin-left: 80px;
+}
+
+.operation-item.level-3 {
+  margin-left: 120px;
+}
+
+.operation-content {
+  display: flex;
+  align-items: flex-start;
+}
+
+.operation-bullet {
+  min-width: 20px;
+  margin-right: 8px;
+  font-weight: bold;
+}
+
+.operation-text {
+  flex: 1;
+  text-align: justify;
+}
+
+/* Table des signatures */
+.signature-table {
+  margin-top: 40px;
+}
+
+.signature-table table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+.signature-table th {
+  text-align: center;
+  font-weight: bold;
+  background-color: #f8f9fa;
+  border: 2px solid #000;
+  padding: 10px;
+}
+
+.signature-table td {
+  border: 2px solid #000;
+  vertical-align: top;
+  padding: 15px;
+}
+
+.signature-cell {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100px;
+}
+
+.signature-info {
+  margin-bottom: 10px;
+}
+
+.signature-date {
+  margin-bottom: 15px;
+}
+
+.signature-line {
+  margin-top: auto;
+}
+
+/* Letterhead styles */
+.letterhead {
+  border-bottom: 2px solid #000;
+  padding-bottom: 15px;
+  margin-bottom: 20px;
+}
+
+.doc-type {
+  font-size: 16px;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: bold;
+  margin: 10px 0;
+  text-transform: uppercase;
+}
+
+.letterhead-right {
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.letterhead-right > div {
+  margin-bottom: 5px;
+}
+
+/* Styles pour l'impression */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  
+  #procedure-print-area, #procedure-print-area * {
+    visibility: visible;
+  }
+  
+  #procedure-print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    padding: 20px;
+  }
+  
+  .no-print, .attachment-card, h5:has(+ .row.g-3) {
+    display: none !important;
+  }
+  
+  .paper-area {
+    font-family: Arial, sans-serif;
+    font-size: 12pt;
+    line-height: 1.4;
+  }
+  
+  .letterhead {
+    border-bottom: 2px solid #000;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .operations-list {
+    margin-left: 20px;
+  }
+  
+  .operation-item {
+    margin-bottom: 8px;
+    page-break-inside: avoid;
+  }
+  
+  .signature-table {
+    margin-top: 30px;
+  }
+  
+  .signature-table table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .signature-table th {
+    background-color: #f8f9fa;
+    text-align: center;
+    padding: 10px;
+    border: 1px solid #dee2e6;
+  }
+  
+  .signature-table td {
+    height: 120px;
+    vertical-align: top;
+    border: 1px solid #dee2e6;
+    position: relative;
+  }
+  
+  .signature-line {
+    position: absolute;
+    bottom: 10px;
+    width: calc(100% - 20px);
+    border-top: 1px solid #000;
+    padding-top: 5px;
+  }
+}
+
+/* Masquer les éléments pendant l'export PDF */
+.export-hidden {
+  visibility: hidden;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .letterhead {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .letterhead-right {
+    text-align: center !important;
+    margin-top: 15px;
+  }
+  
+  .operation-item.level-1 {
+    margin-left: 20px;
+  }
+  
+  .operation-item.level-2 {
+    margin-left: 40px;
+  }
+  
+  .operation-item.level-3 {
+    margin-left: 60px;
+  }
+  
+  .signature-table {
+    font-size: 12px;
+  }
+}

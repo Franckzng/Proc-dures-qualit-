@@ -1,0 +1,15 @@
+.dashboard .summary-card { border-radius: .6rem; }
+.summary-card .icon-wrap {
+  width:56px;height:56px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+}
+.chart-card .chart-bars { margin-top: 1rem; }
+.bar-row {
+  display:flex;align-items:center;gap:12px;margin-bottom:12px;
+}
+.bar-label { width:140px; display:flex; align-items:center; color: #495057; }
+.bar-track { flex:1; height:12px;background:#e9ecef;border-radius:6px;overflow:hidden;margin-right:12px; }
+.bar-fill { height:100%; border-radius:6px 6px 6px 6px; transition:width .45s ease; }
+.bar-value { width:60px; text-align:right; font-weight:600; color:#212529; }
+
+.recent-list .list-group-item { display:flex; justify-content:space-between; align-items:center; }
+.recent-list .fw-semibold { font-size:1rem; }

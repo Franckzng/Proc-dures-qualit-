@@ -1,0 +1,34 @@
+<div *ngIf="step" class="card mb-4">
+  <div class="card-header">
+    Traitement Étape {{ step.ordre }}
+  </div>
+  <div class="card-body">
+    <h5>Procédure : {{ procedureTitle }}</h5>
+    <p>{{ procedureDescription }}</p>
+
+    <div class="mb-3">
+      <label for="commentaire" class="form-label">Commentaire</label>
+      <textarea
+        id="commentaire"
+        class="form-control"
+        rows="4"
+        [(ngModel)]="commentaire"
+      ></textarea>
+    </div>
+
+    <button
+      class="btn btn-success me-2"
+      (click)="process('VALIDE')"
+      [disabled]="!commentaire.trim()"
+    >
+      Valider
+    </button>
+    <button
+      class="btn btn-danger"
+      (click)="process('REJETE')"
+      [disabled]="!commentaire.trim()"
+    >
+      Rejeter
+    </button>
+  </div>
+</div>

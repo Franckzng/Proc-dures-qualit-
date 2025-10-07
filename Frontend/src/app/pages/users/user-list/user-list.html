@@ -1,0 +1,54 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2>Gestion des Utilisateurs</h2>
+  <a routerLink="new" class="btn btn-primary">
+    <i class="bi bi-plus-lg"></i> Nouvel Utilisateur
+  </a>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nom</th>
+            <th>Email</th>
+            <th>Rôle</th>
+            <th>Statut</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of users()">
+            <td>{{ user.id }}</td>
+            <td>{{ user.prenom }} {{ user.nom }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ getRoleName(user.role_id) }}</td>
+            <td>
+              <span class="badge" [ngClass]="{
+                'bg-success': user.actif,
+                'bg-secondary': !user.actif
+              }">
+                {{ user.actif ? 'Actif' : 'Inactif' }}
+              </span>
+            </td>
+            <td>
+              <div class="btn-group">
+                <a [routerLink]="['edit', user.id]" class="btn btn-sm btn-outline-primary">
+                  <i class="bi bi-pencil"></i>
+                </a>
+                <button (click)="toggleUserStatus(user)" class="btn btn-sm btn-outline-danger">
+                  <i class="bi" [ngClass]="{
+                    'bi-person-x': user.actif,
+                    'bi-person-check': !user.actif
+                  }"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,32 @@
+<!--src/app/pages/procedures/departments/department.component.html-->
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2>Procédures — Départements</h2>
+
+  <a *ngIf="currentUser?.role_id === ROLE_ADMIN || currentUser?.role_id === ROLE_REDACTEUR"
+     [routerLink]="['/dashboard','procedures','new']"
+     class="btn btn-primary me-2">
+    <i class="bi bi-plus-lg"></i> Nouvelle Procédure
+  </a>
+</div>
+
+<div class="row g-3">
+  <div class="col-12" *ngIf="departments().length === 0">
+    <div class="alert alert-info">Aucun département trouvé.</div>
+  </div>
+
+  <div class="col-md-4" *ngFor="let d of departments()">
+    <div class="card h-100">
+      <div class="card-body d-flex flex-column">
+        <h5 class="card-title">{{ d.nom }}</h5>
+        <p class="card-text mb-2" *ngIf="d.responsable">Responsable : {{ d.responsable }}</p>
+        <div class="mt-auto d-flex justify-content-between align-items-center">
+          <small class="text-muted">{{ countFor(d.id) }} procédure(s)</small>
+          <button class="btn btn-sm btn-primary" (click)="openDept(d)">
+            Voir les processus
+            <i class="bi bi-chevron-right ms-2"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

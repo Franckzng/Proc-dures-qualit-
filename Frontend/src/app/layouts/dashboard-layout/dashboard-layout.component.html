@@ -1,0 +1,17 @@
+<!-- src/app/layouts/dashboard-layout/dashboard-layout.component.html -->
+<div class="d-flex flex-column min-vh-100">
+  <!-- Barre de navigation -->
+  <app-navbar></app-navbar>
+  
+  <!-- Contenu principal -->
+  <div class="container-fluid flex-grow-1 p-4">
+    <router-outlet></router-outlet>
+  </div>
+  
+  <!-- Pied de page (optionnel) -->
+  <footer class="bg-light py-3 mt-auto">
+    <div class="container text-center">
+      <span class="text-muted">Gestion des Procédures Qualité © 2025</span>
+    </div>
+  </footer>
+</div>

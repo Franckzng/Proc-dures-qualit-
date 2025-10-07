@@ -1,0 +1,5 @@
+/* src/app/pages/procedures/procedure-list/procedure-list.css */
+.list-group-item { cursor: pointer; }
+.list-group-item .bi { font-size: 1.0rem; }
+.list-group-item .text-muted.small { font-size: 0.85rem; }
+.badge { padding: 6px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; }

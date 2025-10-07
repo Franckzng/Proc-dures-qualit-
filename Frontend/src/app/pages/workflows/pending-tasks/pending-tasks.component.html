@@ -1,0 +1,32 @@
+<table class="table table-hover">
+  <thead >
+    <tr *ngIf="pending().length > 0" class="alert alert-info">
+      <th>#</th>
+      <th>Procédure</th>
+      <th>Étape</th>
+      <th>Actions</th>
+    </tr>
+    <div *ngIf="pending().length === 0" class="alert alert-info">Aucun Tâches en Attente.</div>
+  </thead>
+  <tbody>
+    <tr *ngFor="let s of pending()">
+      <td>{{ s.etape_id }}</td>
+      <td>
+        <span *ngIf="s.procedure_titre; else missing">
+          {{ s.procedure_titre }}
+        </span>
+        <ng-template #missing>
+          <em>— Procédure non disponible —</em>
+        </ng-template>
+      </td>
+      <td>{{ s.ordre }}</td>
+      <td>
+        <button
+          class="btn btn-sm btn-primary"
+          (click)="viewProcedure(s)">
+          <i class="bi bi-eye"></i> Voir
+        </button>
+      </td>
+    </tr>
+  </tbody>
+</table>

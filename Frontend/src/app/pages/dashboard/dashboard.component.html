@@ -1,0 +1,145 @@
+<!-- src/app/pages/dashboard/dashboard.component.html -->
+<div class="dashboard container my-4" *ngIf="!loading; else loadingTpl">
+  <div class="row g-3">
+
+    <div class="col-12 d-flex justify-content-between align-items-center mb-2">
+      <div>
+        <h3 class="mb-0">Tableau de bord</h3>
+        <small class="text-muted">
+          Dernière mise à jour :
+          <span *ngIf="summary?.updated_at; else dashNoUpdate">
+            {{ summary?.updated_at | date:'dd/MM/yyyy HH:mm' }}
+          </span>
+          <ng-template #dashNoUpdate>—</ng-template>
+        </small>
+      </div>
+
+      <div class="d-flex align-items-center">
+        <button *ngIf="isRedacteur()"
+          [routerLink]="['/dashboard','procedures','new']"
+          class="btn btn-primary me-2">
+          <i class="bi bi-plus-lg"></i> Nouvelle Procédure
+        </button>
+      </div>
+    </div>
+
+    <!-- SUMMARY CARDS -->
+    <div class="col-lg-3 col-md-6">
+      <div class="card summary-card shadow-sm">
+        <div class="card-body d-flex align-items-center">
+          <div class="me-3 icon-wrap bg-light">
+            <i class="bi bi-collection-play fs-3 text-primary"></i>
+          </div>
+          <div>
+            <div class="text-muted small">Total procédures</div>
+            <div class="h4 mb-0">{{ niceNumber(totalProcedures) }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6" *ngFor="let s of statusOrder">
+      <div class="card summary-card shadow-sm">
+        <div class="card-body d-flex align-items-center">
+          <div class="me-3 icon-wrap bg-light" [style.color]="s.color">
+            <i [class]="'bi ' + s.icon + ' fs-3'"></i>
+          </div>
+          <div>
+            <div class="text-muted small">{{ s.label }}</div>
+            <div class="h5 mb-0">
+              {{ s.key === 'APPROUVEE' ? niceNumber(countApproved)
+                 : s.key === 'PUBLIEE'   ? niceNumber(countPublished)
+                 : s.key === 'BROUILLON' ? niceNumber(countDraft)
+                 : s.key === 'REJETEE'   ? niceNumber(countRejected)
+                 : '0' }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHART -->
+    <div class="col-lg-6">
+      <div class="card shadow-sm chart-card h-100">
+        <div class="card-body">
+          <h6 class="card-title">Répartition par statut</h6>
+
+          <div class="chart-bars">
+            <div class="bar-row" *ngFor="let s of statusOrder">
+              <div class="bar-label">
+                <i [class]="'bi ' + s.icon"></i>
+                <span class="ms-2">{{ s.label }}</span>
+              </div>
+
+              <div class="bar-track">
+                <div class="bar-fill"
+                     [ngStyle]="{
+                       'width': (s.key === 'APPROUVEE' ? percent(countApproved)
+                                : s.key === 'PUBLIEE' ? percent(countPublished)
+                                : s.key === 'BROUILLON' ? percent(countDraft)
+                                : s.key === 'REJETEE' ? percent(countRejected)
+                                : '0%'),
+                       'background': s.color
+                     }"></div>
+              </div>
+
+              <div class="bar-value">
+                {{ s.key === 'APPROUVEE' ? niceNumber(countApproved)
+                   : s.key === 'PUBLIEE'   ? niceNumber(countPublished)
+                   : s.key === 'BROUILLON' ? niceNumber(countDraft)
+                   : s.key === 'REJETEE'   ? niceNumber(countRejected)
+                   : '0' }}
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- RECENT PROCEDURES -->
+    <div class="col-lg-6">
+      <div class="card shadow-sm h-100">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <strong>Procédures récentes</strong>
+          <small class="text-muted">{{ recentProcedures.length }} items</small>
+        </div>
+
+        <ul class="list-group list-group-flush recent-list">
+          <li class="list-group-item d-flex justify-content-between align-items-start"
+              *ngFor="let p of recentProcedures">
+            <div class="me-3">
+              <div class="fw-semibold">{{ p.titre }}</div>
+              <div class="text-muted small">Créé : {{ p.date_creation | date:'dd/MM/yyyy HH:mm' }}</div>
+            </div>
+
+            <div class="text-end">
+              <span class="badge"
+                    [ngClass]="{
+                      'bg-success': p.statut === 'APPROUVEE',
+                      'bg-primary': p.statut === 'PUBLIEE',
+                      'bg-secondary': p.statut === 'BROUILLON',
+                      'bg-danger': p.statut === 'REJETEE'
+                    }">{{ p.statut }}</span>
+              <div class="mt-1">
+                <a [routerLink]="['/dashboard/procedures', p.id]" class="btn btn-sm btn-outline-primary">Voir</a>
+              </div>
+            </div>
+          </li>
+
+          <li class="list-group-item text-center text-muted" *ngIf="recentProcedures.length === 0">
+            Aucune procédure récente
+          </li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<ng-template #loadingTpl>
+  <div class="d-flex justify-content-center align-items-center py-5">
+    <div class="spinner-border text-primary me-3" role="status" aria-hidden="true"></div>
+    <div>Chargement du tableau de bord…</div>
+  </div>
+</ng-template>

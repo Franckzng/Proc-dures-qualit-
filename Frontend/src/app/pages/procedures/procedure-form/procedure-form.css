@@ -1,0 +1,87 @@
+/* src/app/pages/procedures/procedure-form/procedure-form.css */
+
+/* En-tête style "lettre" */
+.letterhead{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:1rem;
+  padding:1rem 1.25rem;
+  border-bottom:1px solid #e9ecef;
+  background: #fff;
+}
+
+.letterhead-left {
+  flex: 0 0 auto;
+}
+.letterhead-center {
+  flex: 1 1 auto;
+  text-align: center;
+}
+.letterhead-right {
+  flex: 0 0 180px;
+  text-align: right;
+}
+
+/* logo */
+.letterhead-logo{
+  max-height:72px;
+  max-width:160px;
+  object-fit:contain;
+}
+
+/* texte de l'entête */
+.letterhead-title{
+  margin:0;
+  font-size:1.25rem;
+  font-weight:700;
+  letter-spacing:1px;
+}
+.letterhead-subtitle{
+  margin:0;
+  font-size:0.9rem;
+  color:#6c757d;
+}
+
+/* meta à droite (version, statut) */
+.doc-meta {
+  font-size:0.85rem;
+  color:#333;
+}
+
+/* Gros titre de document dans le formulaire */
+.doc-title-input {
+  font-size:1.25rem;
+  font-weight:600;
+  padding:0.75rem;
+  height:56px;
+}
+
+/* Styles pour l'indentation dans le formulaire */
+.level-0 {
+  font-weight: bold;
+}
+
+.level-1 {
+  margin-left: 20px;
+  font-weight: normal;
+}
+
+.level-2 {
+  margin-left: 40px;
+  font-style: italic;
+}
+
+.list-group-item {
+  border-left: none;
+  border-right: none;
+}
+
+/* Quelques ajustements responsive */
+@media (max-width: 768px) {
+  .letterhead {
+    flex-direction: column;
+    text-align: center;
+  }
+  .letterhead-right { text-align:center; width:100%; }
+}

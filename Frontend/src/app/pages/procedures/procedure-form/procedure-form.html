@@ -1,0 +1,153 @@
+<!-- src/app/pages/procedures/procedure-form/procedure-form.html -->
+<div class="card">
+  <div class="card-body">
+    <form (ngSubmit)="saveProcedure()"
+          *ngIf="!isLoading; else loadingTemplate"
+          #procedureForm="ngForm">
+
+      <div class="row">
+        <div class="col-md-8 mb-3">
+          <label for="titre" class="form-label visually-hidden">Titre *</label>
+          <input type="text" id="titre" name="titre"
+                 class="form-control doc-title-input"
+                 placeholder="Titre de la procédure (ex: Procédure de gestion des non-conformités)"
+                 [(ngModel)]="procedure.titre" required #titreInput="ngModel">
+          <div *ngIf="titreInput.invalid && (titreInput.dirty || titreInput.touched)"
+               class="text-danger mt-1">Le titre est obligatoire</div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <label for="code" class="form-label">Code</label>
+          <input type="text" id="code" name="code"
+                 class="form-control"
+                 placeholder="Ex: PROC-Q-001"
+                 [(ngModel)]="procedure.code">
+          <div class="form-text">Codification interne (facultatif)</div>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="description" class="form-label">Brève description</label>
+        <textarea class="form-control" id="description"
+                  name="description"
+                  [(ngModel)]="procedure.description"
+                  rows="2"
+                  placeholder="Résumé / objet de la procédure (court)"></textarea>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Étapes de la procédure *</label>
+        <div class="steps-tree border p-3 bg-light">
+          <ul class="list-group">
+            <ng-container *ngFor="let step of steps; let i = index">
+              <li class="list-group-item ps-3">
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="level-0">{{ (step.contenu || '').substring(0, 50) || 'Étape vide' }}...</span>
+                  <div>
+                    <button type="button" class="btn btn-sm btn-primary me-1" (click)="editStep(step); $event.stopPropagation()">Éditer</button>
+                    <button type="button" class="btn btn-sm btn-secondary me-1" (click)="addStep(step); $event.stopPropagation()">Ajouter sous-étape</button>
+                    <button type="button" class="btn btn-sm btn-danger" (click)="deleteStep(step); $event.stopPropagation()">Supprimer</button>
+                  </div>
+                </div>
+
+                <ul *ngIf="step.children?.length" class="list-group mt-2">
+                  <ng-container *ngFor="let subStep of step.children; let j = index">
+                    <li class="list-group-item ms-4 ps-3">
+                      <div class="d-flex justify-content-between align-items-center">
+                        <span class="level-1">{{ (subStep.contenu || '').substring(0, 50) || 'Sous-étape vide' }}...</span>
+                        <div>
+                          <button type="button" class="btn btn-sm btn-primary me-1" (click)="editStep(subStep); $event.stopPropagation()">Éditer</button>
+                          <button type="button" class="btn btn-sm btn-secondary me-1" (click)="addStep(subStep); $event.stopPropagation()">Ajouter sous-étape</button>
+                          <button type="button" class="btn btn-sm btn-danger" (click)="deleteStep(subStep); $event.stopPropagation()">Supprimer</button>
+                        </div>
+                      </div>
+
+                      <ul *ngIf="subStep.children?.length" class="list-group mt-2">
+                        <ng-container *ngFor="let subSubStep of subStep.children; let k = index">
+                          <li class="list-group-item ms-5 ps-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                              <span class="level-2">{{ (subSubStep.contenu || '').substring(0, 50) || 'Sous-sous-étape vide' }}...</span>
+                              <div>
+                                <button type="button" class="btn btn-sm btn-primary me-1" (click)="editStep(subSubStep); $event.stopPropagation()">Éditer</button>
+                                <button type="button" class="btn btn-sm btn-danger" (click)="deleteStep(subSubStep); $event.stopPropagation()">Supprimer</button>
+                              </div>
+                            </div>
+                          </li>
+                        </ng-container>
+                      </ul>
+                    </li>
+                  </ng-container>
+                </ul>
+              </li>
+            </ng-container>
+          </ul>
+
+          <button type="button" class="btn btn-success mt-2" (click)="addStep(); $event.stopPropagation()">Ajouter étape principale</button>
+        </div>
+      </div>
+
+      <div *ngIf="selectedStep" class="mb-3 border p-3 bg-secondary-subtle">
+        <h5>Édition de l'étape</h5>
+        <div class="mb-2">
+          <label for="stepContenu" class="form-label">Description de l'étape</label>
+          <textarea id="stepContenu" class="form-control" rows="4" [(ngModel)]="selectedStep.contenu" name="stepContenu"></textarea>
+        </div>
+        <button type="button" class="btn btn-primary" (click)="saveStep()">Sauvegarder étape</button>
+        <button type="button" class="btn btn-secondary ms-2" (click)="selectedStep = null">Annuler</button>
+      </div>
+
+      <div class="row">
+        <!--<div class="col-md-6 mb-3">
+          <label for="departement" class="form-label">Département *</label>
+          <select class="form-select" id="departement"
+                  name="departement_id"
+                  [(ngModel)]="procedure.departement_id"
+                  required #departementSelect="ngModel">
+            <option value="" disabled>Sélectionnez un département</option>
+            <option *ngFor="let dept of departments()" [value]="dept.id">{{ dept.nom }}</option>
+          </select>
+          <div *ngIf="departementSelect.invalid && (departementSelect.dirty || departementSelect.touched)"
+               class="text-danger mt-1">Le département est obligatoire</div>
+        </div>-->
+
+        <div class="col-md-6 mb-3">
+          <label for="processus" class="form-label">Processus</label>
+          <input type="text" class="form-control" id="processus" name="processus" [(ngModel)]="procedure.processus">
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="norme" class="form-label">Norme</label>
+        <input type="text" class="form-control" id="norme" name="norme" [(ngModel)]="procedure.norme">
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Fichiers à joindre</label>
+        <input type="file" (change)="onFilesSelected($event)" multiple class="form-control" />
+        <ul class="list-group list-group-flush mt-2">
+          <li *ngFor="let att of attachments" class="list-group-item">
+            <i class="bi bi-paperclip me-1"></i>
+            <a [href]="att.url" target="_blank">{{ att.original_name }}</a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="d-flex justify-content-end mt-4">
+        <button type="button" class="btn btn-outline-secondary me-2" routerLink="/dashboard/procedures">
+          <i class="bi bi-x-circle me-1"></i> Annuler
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="procedureForm.invalid || steps.length === 0">
+          <i class="bi" [ngClass]="{ 'bi-save': !isEditMode, 'bi-pencil': isEditMode }"></i>
+          {{ isEditMode ? 'Mettre à jour' : 'Créer' }}
+        </button>
+      </div>
+    </form>
+
+    <ng-template #loadingTemplate>
+      <div class="d-flex flex-column align-items-center justify-content-center py-5">
+        <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Chargement...</span></div>
+        <p class="mt-3 mb-0 text-muted">{{ isEditMode ? 'Chargement de la procédure...' : 'Préparation du formulaire...' }}</p>
+      </div>
+    </ng-template>
+  </div>
+</div>

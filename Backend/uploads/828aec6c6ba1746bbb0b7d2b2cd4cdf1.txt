@@ -1,0 +1,26 @@
+-- 1) Désactiver temporairement les contraintes de FK
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- 2) Vider les tables dans le bon ordre (d’abord les enfants, puis les parents)
+DELETE FROM notifications;
+DELETE FROM etapes_workflow;
+DELETE FROM workflows_approbation;
+DELETE FROM procedures;
+DELETE FROM attachments;
+DELETE FROM procedure_attachments;
+DELETE FROM steps;
+DELETE FROM step_versions;
+
+
+-- 3) Réinitialiser les AUTO_INCREMENT
+ALTER TABLE notifications         	AUTO_INCREMENT = 1;
+ALTER TABLE etapes_workflow       	AUTO_INCREMENT = 1;
+ALTER TABLE workflows_approbation 	AUTO_INCREMENT = 1;
+ALTER TABLE procedures		 	AUTO_INCREMENT = 1;
+ALTER TABLE attachments		 	AUTO_INCREMENT = 1;
+ALTER TABLE steps            		AUTO_INCREMENT = 1;
+ALTER TABLE step_versions            	AUTO_INCREMENT = 1;
+
+
+-- 4) Réactiver les contraintes de FK
+SET FOREIGN_KEY_CHECKS = 1;

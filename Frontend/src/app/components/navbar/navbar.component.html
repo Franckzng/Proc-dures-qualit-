@@ -1,0 +1,75 @@
+<!--src/app/components/navbar/navbar.component.html-->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+  <div class="container-fluid">
+    <a class="navbar-brand" routerLink="/dashboard">
+      <i class="bi bi-clipboard-check me-2"></i>Gestion des Procédures Sonabhy
+    </a>
+
+    <button class="navbar-toggler" type="button"
+            (click)="isCollapsed = !isCollapsed"
+            aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" [ngbCollapse]="isCollapsed">
+      <ul class="navbar-nav me-auto">
+        <!-- Procédures -->
+        <li class="nav-item">
+          <a class="nav-link"
+             routerLink="/dashboard/procedures"
+             routerLinkActive="active"
+             [routerLinkActiveOptions]="{ exact: true }">
+            <i class="bi bi-file-earmark-text me-1"></i>Procédures
+          </a>
+        </li>
+
+        <!-- Tâches en Attente -->
+        <li class="nav-item" *ngIf="canSeeTasks()">
+          <a class="nav-link"
+             routerLink="/dashboard/workflows/pending"
+             routerLinkActive="active">
+            <i class="bi bi-list-task me-1"></i>Tâches en Attente
+            <span *ngIf="pendingTasksCount() > 0"
+                  class="badge bg-danger ms-1">
+              {{ pendingTasksCount() }}
+            </span>
+          </a>
+        </li>
+
+        <!-- Utilisateurs (Admin) -->
+        <li class="nav-item" *ngIf="isAdmin">
+          <a class="nav-link"
+             routerLink="/dashboard/users"
+             routerLinkActive="active">
+            <i class="bi bi-people me-1"></i>Utilisateurs
+          </a>
+        </li>
+      </ul>
+
+      <div class="d-flex">
+        <div class="dropdown">
+          <button class="btn btn-outline-light dropdown-toggle"
+                  type="button" id="userDropdown"
+                  data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-person-circle me-2"></i>
+            {{ currentUserEmail }}
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+            <li><a class="dropdown-item" href="#">
+                <i class="bi bi-person me-2"></i>Profil
+            </a></li>
+            <li><a class="dropdown-item" href="#">
+                <i class="bi bi-gear me-2"></i>Paramètres
+            </a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <a class="dropdown-item" (click)="logout()">
+                <i class="bi bi-box-arrow-right me-2"></i>Déconnexion
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
