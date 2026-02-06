@@ -13,6 +13,9 @@ export interface DashboardSummary {
     statut: string;
     date_creation: string;
   }[];
+  workflowsInProgress?: number;
+  pendingForUser?: number;
+  pendingCountGlobal?: number;
   updated_at?: string;
 }
 

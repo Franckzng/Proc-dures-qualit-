@@ -1,23 +1,51 @@
-<div class="container mt-5">
-  <div class="row justify-content-center">
-    <div class="col-md-6">
-      <div class="card">
-        <div class="card-header">Connexion</div>
-        <div class="card-body">
-          <form (ngSubmit)="login()">
-            <div class="mb-3">
-              <label for="email" class="form-label">Email</label>
-              <input type="email" class="form-control" id="email" [(ngModel)]="credentials.email" name="email" required autocomplete="username">
-            </div>
-            <div class="mb-3">
-              <label for="password" class="form-label">Mot de passe</label>
-              <input type="password" class="form-control" id="password" [(ngModel)]="credentials.password" name="password" required autocomplete="current-password">
-            </div>
-            <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
-            <button type="submit" class="btn btn-primary">Se connecter</button>
-          </form>
-        </div>
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <div class="logo-circle">
+        <i class="bi bi-shield-check"></i>
       </div>
+      <h2>Gestion des Procédures</h2>
+      <p>Connectez-vous à votre compte</p>
     </div>
+    
+    <form (ngSubmit)="login()" class="login-form">
+      <div class="form-group">
+        <label for="email">
+          <i class="bi bi-envelope"></i> Email
+        </label>
+        <input 
+          type="email" 
+          id="email" 
+          [(ngModel)]="credentials.email" 
+          name="email" 
+          required 
+          autocomplete="username"
+          placeholder="votre@email.com">
+      </div>
+      
+      <div class="form-group">
+        <label for="password">
+          <i class="bi bi-lock"></i> Mot de passe
+        </label>
+        <input 
+          type="password" 
+          id="password" 
+          [(ngModel)]="credentials.password" 
+          name="password" 
+          required 
+          autocomplete="current-password"
+          placeholder="••••••••">
+      </div>
+      
+      <div *ngIf="errorMessage" class="error-message">
+        <i class="bi bi-exclamation-circle"></i>
+        {{ errorMessage }}
+      </div>
+      
+      <button type="submit" class="btn-login">
+        <span>Se connecter</span>
+        <i class="bi bi-arrow-right"></i>
+      </button>
+    </form>
   </div>
 </div>

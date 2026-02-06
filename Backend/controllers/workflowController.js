@@ -1,6 +1,8 @@
 // backend/controllers/workflowController.js
 
 const db = require('../config/db');
+const NotificationService = require('../services/notificationService');
+const AuditService = require('../services/auditService');
 const {
   STATUT_EN_REVISION,
   STATUT_EN_COURS,
@@ -190,6 +192,9 @@ exports.processStep = async (req, res, next) => {
       [workflowId]
     );
     const procedureId = wfRow.procedure_id;
+    
+    const [[proc]] = await db.query('SELECT titre FROM procedures WHERE id = ?', [procedureId]);
+    const procedureTitle = proc?.titre || 'Procédure';
 
     if (action === 'VALIDE') {
       // Combien d'étapes restent EN_ATTENTE ?
@@ -215,6 +220,13 @@ exports.processStep = async (req, res, next) => {
            WHERE id = ?`,
           [STATUT_APPROUVEE, procedureId]
         );
+        
+        const [[initiator]] = await db.query(
+          'SELECT initiateur_id FROM workflows_approbation WHERE id = ?',
+          [workflowId]
+        );
+        await NotificationService.notifyWorkflowStep(initiator.initiateur_id, procedureTitle, 'approved');
+        await AuditService.log(userId, 'APPROVE', 'procedure', procedureId, { workflowId });
 
       } else if (etape.ordre === 1) {
         // Le vérificateur vient de valider → passer la procédure en EN_APPROBATION
@@ -224,6 +236,14 @@ exports.processStep = async (req, res, next) => {
            WHERE id = ?`,
           [STATUT_EN_APPROBATION, procedureId]
         );
+        
+        const [[nextStep]] = await db.query(
+          'SELECT utilisateur_id FROM etapes_workflow WHERE workflow_id = ? AND ordre = 2',
+          [workflowId]
+        );
+        if (nextStep?.utilisateur_id) {
+          await NotificationService.notifyWorkflowStep(nextStep.utilisateur_id, procedureTitle, 'assigned');
+        }
       }
 
     } else {
@@ -240,6 +260,13 @@ exports.processStep = async (req, res, next) => {
          WHERE id = ?`,
         [STATUT_REJETEE, procedureId]
       );
+      
+      const [[initiator]] = await db.query(
+        'SELECT initiateur_id FROM workflows_approbation WHERE id = ?',
+        [workflowId]
+      );
+      await NotificationService.notifyWorkflowStep(initiator.initiateur_id, procedureTitle, 'rejected');
+      await AuditService.log(userId, 'REJECT', 'procedure', procedureId, { workflowId, commentaire });
     }
 
 

@@ -13,22 +13,41 @@
 
     <div class="collapse navbar-collapse" [ngbCollapse]="isCollapsed">
       <ul class="navbar-nav me-auto">
-        <!-- Procédures -->
+        <!-- Dashboard -->
         <li class="nav-item">
           <a class="nav-link"
-             routerLink="/dashboard/procedures"
+             routerLink="/dashboard"
              routerLinkActive="active"
              [routerLinkActiveOptions]="{ exact: true }">
-            <i class="bi bi-file-earmark-text me-1"></i>Procédures
+            <i class="bi bi-speedometer2 me-1"></i>Tableau de bord
           </a>
         </li>
 
-        <!-- Tâches en Attente -->
+        <!-- Procédures (avec dropdown) -->
+        <li class="nav-item dropdown" ngbDropdown>
+          <a class="nav-link dropdown-toggle" ngbDropdownToggle>
+            <i class="bi bi-file-earmark-text me-1"></i>Procédures
+          </a>
+          <div class="dropdown-menu" ngbDropdownMenu>
+            <a class="dropdown-item" routerLink="/dashboard/procedures">
+              <i class="bi bi-list me-2"></i>Toutes les procédures
+            </a>
+            <a class="dropdown-item" routerLink="/dashboard/search">
+              <i class="bi bi-search me-2"></i>Recherche avancée
+            </a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" routerLink="/dashboard/procedures/new" *ngIf="canCreateProcedure()">
+              <i class="bi bi-plus-circle me-2"></i>Nouvelle procédure
+            </a>
+          </div>
+        </li>
+
+        <!-- Workflows -->
         <li class="nav-item" *ngIf="canSeeTasks()">
           <a class="nav-link"
              routerLink="/dashboard/workflows/pending"
              routerLinkActive="active">
-            <i class="bi bi-list-task me-1"></i>Tâches en Attente
+            <i class="bi bi-arrow-repeat me-1"></i>Workflows
             <span *ngIf="pendingTasksCount() > 0"
                   class="badge bg-danger ms-1">
               {{ pendingTasksCount() }}
@@ -36,17 +55,78 @@
           </a>
         </li>
 
-        <!-- Utilisateurs (Admin) -->
-        <li class="nav-item" *ngIf="isAdmin">
+        <!-- Rapports & Statistiques -->
+        <li class="nav-item">
           <a class="nav-link"
-             routerLink="/dashboard/users"
+             routerLink="/dashboard/reports"
              routerLinkActive="active">
-            <i class="bi bi-people me-1"></i>Utilisateurs
+            <i class="bi bi-graph-up me-1"></i>Rapports
           </a>
+        </li>
+
+        <!-- Administration (Admin only) -->
+        <li class="nav-item dropdown" ngbDropdown *ngIf="isAdmin">
+          <a class="nav-link dropdown-toggle" ngbDropdownToggle>
+            <i class="bi bi-gear me-1"></i>Administration
+          </a>
+          <div class="dropdown-menu" ngbDropdownMenu>
+            <a class="dropdown-item" routerLink="/dashboard/users">
+              <i class="bi bi-people me-2"></i>Utilisateurs
+            </a>
+            <a class="dropdown-item" routerLink="/dashboard/audit">
+              <i class="bi bi-shield-check me-2"></i>Logs d'audit
+            </a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="#">
+              <i class="bi bi-sliders me-2"></i>Paramètres système
+            </a>
+          </div>
         </li>
       </ul>
 
-      <div class="d-flex">
+      <div class="d-flex align-items-center gap-3">
+        <!-- Notifications -->
+        <div class="dropdown" ngbDropdown>
+          <button class="btn btn-outline-light position-relative" ngbDropdownToggle>
+            <i class="bi bi-bell"></i>
+            <span *ngIf="notificationService.unreadCount() > 0" 
+                  class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+              {{ notificationService.unreadCount() }}
+              <span class="visually-hidden">notifications non lues</span>
+            </span>
+          </button>
+          <div class="dropdown-menu dropdown-menu-end notification-dropdown" ngbDropdownMenu>
+            <div class="notification-header">
+              <h6>Notifications ({{ notificationService.unreadCount() }})</h6>
+              <button *ngIf="notificationService.unreadCount() > 0" 
+                      class="btn btn-sm btn-link" 
+                      (click)="markAllAsRead()">
+                Tout marquer comme lu
+              </button>
+            </div>
+            <div class="notification-list">
+              <div *ngIf="notificationService.notifications().length === 0" class="text-center py-3 text-muted">
+                <i class="bi bi-bell-slash"></i>
+                <p class="mb-0 mt-2">Aucune notification</p>
+              </div>
+              <div *ngFor="let notif of notificationService.notifications()" 
+                   class="notification-item" 
+                   [class.unread]="!notif.is_read"
+                   (click)="markAsRead(notif.id)">
+                <div class="notification-icon">
+                  <i class="bi" [ngClass]="getNotificationIcon(notif.type)"></i>
+                </div>
+                <div class="notification-content">
+                  <strong>{{ notif.title }}</strong>
+                  <p>{{ notif.message }}</p>
+                  <small>{{ formatDate(notif.created_at) }}</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- User Menu -->
         <div class="dropdown">
           <button class="btn btn-outline-light dropdown-toggle"
                   type="button" id="userDropdown"

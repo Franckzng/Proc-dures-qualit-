@@ -1,0 +1,168 @@
+<div class="reports-container">
+  <div class="reports-header">
+    <h2><i class="bi bi-graph-up"></i> Rapports & Statistiques</h2>
+    <div class="date-filter">
+      <input type="date" [(ngModel)]="dateRange.start" class="form-control">
+      <span>à</span>
+      <input type="date" [(ngModel)]="dateRange.end" class="form-control">
+      <button class="btn btn-primary" (click)="loadAllReports()">
+        <i class="bi bi-arrow-clockwise"></i> Actualiser
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="loading()" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status"></div>
+    <p class="mt-3">Chargement des rapports...</p>
+  </div>
+
+  <div *ngIf="!loading()">
+    <!-- KPIs -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-icon bg-success">
+          <i class="bi bi-check-circle"></i>
+        </div>
+        <div class="kpi-content">
+          <h3>{{ getApprovalRate() }}%</h3>
+          <p>Taux d'approbation</p>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon bg-danger">
+          <i class="bi bi-x-circle"></i>
+        </div>
+        <div class="kpi-content">
+          <h3>{{ getRejectionRate() }}%</h3>
+          <p>Taux de rejet</p>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon bg-info">
+          <i class="bi bi-clock"></i>
+        </div>
+        <div class="kpi-content">
+          <h3>{{ timeStats()?.avg_days || 0 | number:'1.0-0' }}j</h3>
+          <p>Délai moyen d'approbation</p>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon bg-warning">
+          <i class="bi bi-exclamation-triangle"></i>
+        </div>
+        <div class="kpi-content">
+          <h3>{{ obsoleteProcedures().length }}</h3>
+          <p>Procédures obsolètes</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Grid -->
+    <div class="charts-grid">
+      <!-- Procédures par département -->
+      <div class="chart-card">
+        <h5><i class="bi bi-building"></i> Procédures par Département</h5>
+        <div class="chart-content">
+          <div *ngFor="let dept of deptStats()" class="bar-item">
+            <div class="bar-label">
+              <span>{{ dept.department_name }}</span>
+              <strong>{{ dept.total }}</strong>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill bg-primary" 
+                   [style.width]="getProgressWidth(dept.total, deptStats()[0]?.total || 1)"></div>
+            </div>
+            <div class="bar-details">
+              <span class="badge bg-success">{{ dept.approved }} approuvées</span>
+              <span class="badge bg-secondary">{{ dept.draft }} brouillons</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Procédures par norme -->
+      <div class="chart-card">
+        <h5><i class="bi bi-award"></i> Procédures par Norme</h5>
+        <div class="chart-content">
+          <div *ngFor="let norme of normeStats()" class="bar-item">
+            <div class="bar-label">
+              <span>{{ norme.norme }}</span>
+              <strong>{{ norme.count }}</strong>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill bg-success" 
+                   [style.width]="getProgressWidth(norme.count, normeStats()[0]?.count || 1)"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Taux de rejet par utilisateur -->
+      <div class="chart-card">
+        <h5><i class="bi bi-person-x"></i> Taux de Rejet par Utilisateur</h5>
+        <div class="chart-content">
+          <div *ngFor="let user of rejectionStats().slice(0, 5)" class="bar-item">
+            <div class="bar-label">
+              <span>{{ user.prenom }} {{ user.nom }} ({{ user.role_nom }})</span>
+              <strong>{{ user.rejections }}/{{ user.total_reviews }}</strong>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill bg-danger" 
+                   [style.width]="getProgressWidth(user.rejections, user.total_reviews)"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Performance des workflows -->
+      <div class="chart-card">
+        <h5><i class="bi bi-speedometer"></i> Performance des Workflows (12 derniers mois)</h5>
+        <div class="chart-content">
+          <div *ngFor="let perf of workflowPerf()" class="bar-item">
+            <div class="bar-label">
+              <span>{{ perf.month }}</span>
+              <strong>{{ perf.total_workflows }} workflows</strong>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill bg-info" 
+                   [style.width]="getProgressWidth(perf.total_workflows, workflowPerf()[0]?.total_workflows || 1)"></div>
+            </div>
+            <div class="bar-details">
+              <span class="badge bg-success">{{ perf.approved }} approuvés</span>
+              <span class="badge bg-danger">{{ perf.rejected }} rejetés</span>
+              <span class="badge bg-secondary">{{ perf.avg_duration | number:'1.0-0' }}j</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Procédures obsolètes -->
+    <div class="obsolete-section" *ngIf="obsoleteProcedures().length > 0">
+      <h5><i class="bi bi-exclamation-triangle"></i> Procédures Obsolètes (> 12 mois)</h5>
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Titre</th>
+              <th>Département</th>
+              <th>Dernière modification</th>
+              <th>Mois écoulés</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let proc of obsoleteProcedures().slice(0, 10)">
+              <td>{{ proc.titre }}</td>
+              <td>{{ proc.departement_nom || 'N/A' }}</td>
+              <td>{{ proc.date_modification | date:'dd/MM/yyyy' }}</td>
+              <td><span class="badge bg-warning">{{ proc.months_since_update }} mois</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

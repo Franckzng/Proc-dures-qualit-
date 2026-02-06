@@ -46,6 +46,32 @@ export class DashboardComponent implements OnInit {
     return this.authService.currentUser()?.role_id === ROLE_REDACTEUR;
   }
 
+  canSeeTasks(): boolean {
+    const u = this.authService.currentUser();
+    if (!u) return false;
+    return u.role_id === 3 || u.role_id === 2 || u.role_id === 1; // Vérificateur, Approbateur, Admin
+  }
+
+  getStatusClass(statut: string): string {
+    const classes: Record<string, string> = {
+      'APPROUVEE': 'status-approved',
+      'PUBLIEE': 'status-published',
+      'BROUILLON': 'status-draft',
+      'REJETEE': 'status-rejected'
+    };
+    return classes[statut] || 'status-default';
+  }
+
+  getStatusBadge(statut: string): string {
+    const badges: Record<string, string> = {
+      'APPROUVEE': 'bg-success',
+      'PUBLIEE': 'bg-primary',
+      'BROUILLON': 'bg-secondary',
+      'REJETEE': 'bg-danger'
+    };
+    return badges[statut] || 'bg-secondary';
+  }
+
   onAddNorme(): void {
     // navigation vers la page de création de norme (à créer si pas encore)
     this.router.navigate(['/dashboard/normes/new']);

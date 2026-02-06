@@ -1,0 +1,127 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "API Gestion des Procédures Qualité",
+    "version": "1.0.0",
+    "description": "API pour la gestion des procédures qualité avec workflow d'approbation"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000/api",
+      "description": "Serveur de développement"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/auth/login": {
+      "post": {
+        "tags": ["Authentification"],
+        "summary": "Connexion utilisateur",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": { "type": "string" },
+                  "password": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Connexion réussie" }
+        }
+      }
+    },
+    "/procedures": {
+      "get": {
+        "tags": ["Procédures"],
+        "summary": "Liste des procédures",
+        "responses": {
+          "200": { "description": "Liste des procédures" }
+        }
+      },
+      "post": {
+        "tags": ["Procédures"],
+        "summary": "Créer une procédure",
+        "responses": {
+          "201": { "description": "Procédure créée" }
+        }
+      }
+    },
+    "/search/advanced": {
+      "get": {
+        "tags": ["Recherche"],
+        "summary": "Recherche avancée",
+        "parameters": [
+          { "name": "keyword", "in": "query", "schema": { "type": "string" } },
+          { "name": "statut", "in": "query", "schema": { "type": "string" } },
+          { "name": "departement_id", "in": "query", "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "Résultats de recherche" }
+        }
+      }
+    },
+    "/reports/approval-rate": {
+      "get": {
+        "tags": ["Rapports"],
+        "summary": "Taux d'approbation",
+        "parameters": [
+          { "name": "startDate", "in": "query", "schema": { "type": "string", "format": "date" } },
+          { "name": "endDate", "in": "query", "schema": { "type": "string", "format": "date" } }
+        ],
+        "responses": {
+          "200": { "description": "Statistiques d'approbation" }
+        }
+      }
+    },
+    "/audit/logs": {
+      "get": {
+        "tags": ["Audit"],
+        "summary": "Logs d'audit",
+        "responses": {
+          "200": { "description": "Liste des logs" }
+        }
+      }
+    },
+    "/notifications": {
+      "get": {
+        "tags": ["Notifications"],
+        "summary": "Notifications utilisateur",
+        "responses": {
+          "200": { "description": "Liste des notifications" }
+        }
+      }
+    },
+    "/versions/procedure/{procedureId}": {
+      "get": {
+        "tags": ["Versions"],
+        "summary": "Historique des versions",
+        "parameters": [
+          { "name": "procedureId", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "Liste des versions" }
+        }
+      }
+    }
+  }
+}

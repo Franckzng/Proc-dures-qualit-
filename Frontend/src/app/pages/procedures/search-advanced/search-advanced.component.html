@@ -1,0 +1,99 @@
+<div class="search-container">
+  <div class="search-header">
+    <h2><i class="bi bi-search"></i> Recherche Avancée</h2>
+    <p>Utilisez les filtres ci-dessous pour affiner votre recherche</p>
+  </div>
+
+  <div class="search-filters">
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label"><i class="bi bi-search"></i> Mot-clé</label>
+        <input type="text" class="form-control" [(ngModel)]="filters.keyword" 
+               placeholder="Rechercher dans titre, description, contenu...">
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label"><i class="bi bi-building"></i> Département</label>
+        <input type="text" class="form-control" [(ngModel)]="filters.processus" 
+               placeholder="Nom du département">
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label"><i class="bi bi-diagram-3"></i> Processus</label>
+        <input type="text" class="form-control" [(ngModel)]="filters.processus" 
+               placeholder="Nom du processus">
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label"><i class="bi bi-award"></i> Norme</label>
+        <input type="text" class="form-control" [(ngModel)]="filters.norme" 
+               placeholder="Ex: ISO 9001">
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label"><i class="bi bi-calendar"></i> Date début</label>
+        <input type="date" class="form-control" [(ngModel)]="filters.dateDebut">
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label"><i class="bi bi-calendar"></i> Date fin</label>
+        <input type="date" class="form-control" [(ngModel)]="filters.dateFin">
+      </div>
+
+      <div class="col-12">
+        <label class="form-label"><i class="bi bi-tags"></i> Statuts</label>
+        <div class="statut-chips">
+          <div *ngFor="let opt of statutOptions" 
+               class="statut-chip" 
+               [class.active]="selectedStatuts.includes(opt.value)"
+               (click)="toggleStatut(opt.value)">
+            <i class="bi" [ngClass]="selectedStatuts.includes(opt.value) ? 'bi-check-circle-fill' : 'bi-circle'"></i>
+            {{ opt.label }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="search-actions">
+      <button class="btn btn-primary" (click)="search()" [disabled]="loading()">
+        <i class="bi bi-search"></i>
+        <span *ngIf="!loading()">Rechercher</span>
+        <span *ngIf="loading()">Recherche...</span>
+      </button>
+      <button class="btn btn-outline-secondary" (click)="reset()">
+        <i class="bi bi-arrow-counterclockwise"></i> Réinitialiser
+      </button>
+    </div>
+  </div>
+
+  <div class="search-results" *ngIf="results().length > 0">
+    <div class="results-header">
+      <h5>{{ results().length }} résultat(s) trouvé(s)</h5>
+    </div>
+    
+    <div class="results-list">
+      <div *ngFor="let proc of results()" class="result-card">
+        <div class="result-header">
+          <h6>
+            <a [routerLink]="['/dashboard/procedures', proc.id]">{{ proc.titre }}</a>
+          </h6>
+          <span class="badge" [ngClass]="getStatutBadgeClass(proc.statut)">
+            {{ proc.statut }}
+          </span>
+        </div>
+        <p class="result-description">{{ proc.description }}</p>
+        <div class="result-meta">
+          <span *ngIf="proc.code"><i class="bi bi-hash"></i> {{ proc.code }}</span>
+          <span *ngIf="proc.departement_nom"><i class="bi bi-building"></i> {{ proc.departement_nom }}</span>
+          <span *ngIf="proc.processus"><i class="bi bi-diagram-3"></i> {{ proc.processus }}</span>
+          <span *ngIf="proc.norme"><i class="bi bi-award"></i> {{ proc.norme }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="no-results" *ngIf="!loading() && results().length === 0 && (filters.keyword || selectedStatuts.length > 0)">
+    <i class="bi bi-inbox"></i>
+    <p>Aucun résultat trouvé</p>
+  </div>
+</div>

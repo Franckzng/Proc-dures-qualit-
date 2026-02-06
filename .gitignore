@@ -1,39 +1,86 @@
-
-# Ignore all node_modules
+# Dependencies
 node_modules/
-# See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
-# Compiled output
+package-lock.json
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Build outputs
 /dist
 /tmp
 /out-tsc
 /bazel-out
-# Node
-/node_modules
-npm-debug.log
-yarn-error.log
-# IDEs and editors
-.idea/
-.project
-.classpath
-.c9/
-*.launch
-.settings/
-*.sublime-workspace
-# Visual Studio Code
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-.history/*
-# Miscellaneous
-/.angular/cache
-.sass-cache/
-/connect.lock
-/coverage
-/libpeerconnection.log
-testem.log
-/typings
-# System files
+.angular/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# OS files
 .DS_Store
 Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+.project
+.classpath
+.settings/
+
+# Uploads et fichiers temporaires
+Backend/uploads/*
+!Backend/uploads/.gitkeep
+
+# Database
+*.sql
+*.sqlite
+*.db
+
+# Documentation et diagrammes (à exclure du code)
+*.md
+!README.md
+*.puml
+*.pdf
+*.docx
+*.doc
+
+# Scripts temporaires
+*.sh
+!Backend/install.sh
+
+# Test files
+*.test.js
+*.spec.js
+coverage/
+
+# Cache
+.cache/
+.sass-cache/
+*.cache
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Compiled files
+*.class
+*.jar
+*.war
+*.ear
+
+# Sequelize
+.sequelizerc
+
+# Autres
+.qodo/

@@ -102,6 +102,31 @@ export const routes: Routes = [
             .then(m => m.ProcessStepComponent),
       },
 
+      // RAPPORTS
+      {
+        path: 'reports',
+        loadComponent: () =>
+          import('./pages/reports/reports.component')
+            .then(m => m.ReportsComponent),
+      },
+
+      // RECHERCHE AVANCÉE
+      {
+        path: 'search',
+        loadComponent: () =>
+          import('./pages/procedures/search-advanced/search-advanced.component')
+            .then(m => m.SearchAdvancedComponent),
+      },
+
+      // AUDIT (Admin only)
+      {
+        path: 'audit',
+        canActivate: [roleGuard(UserRole.ADMIN)],
+        loadComponent: () =>
+          import('./pages/audit/audit.component')
+            .then(m => m.AuditComponent),
+      },
+
       // fallback au sein du layout
       { path: 'home', redirectTo: '', pathMatch: 'full' },
       { path: '**', redirectTo: '', pathMatch: 'full' }

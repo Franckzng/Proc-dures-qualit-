@@ -1,5 +1,8 @@
 // backend/controllers/procedureController.js
 const db = require('../config/db');
+const AuditService = require('../services/auditService');
+const VersionService = require('../services/versionService');
+const NotificationService = require('../services/notificationService');
 const {
   ROLE_ADMIN,
   ROLE_REDACTEUR,
@@ -146,6 +149,8 @@ async function createProcedure(req, res) {
       [titre, code || null, description, version,
        defaultStatut, departement_id, processus, norme, redacteurId]
     );
+    
+    await AuditService.log(redacteurId, 'CREATE', 'procedure', result.insertId, { titre, code });
     res.status(201).json({ id: result.insertId });
   } catch (error) {
     console.error('Erreur createProcedure:', error);
@@ -184,6 +189,8 @@ async function updateProcedure(req, res) {
       norme
     } = req.body;
 
+    await VersionService.createVersion(id, req.user.id);
+    
     await db.query(
       `UPDATE procedures SET
          titre         = ?,
@@ -199,6 +206,8 @@ async function updateProcedure(req, res) {
        statut, departement_id, processus, norme,
        id]
     );
+    
+    await AuditService.log(req.user.id, 'UPDATE', 'procedure', id, { titre, version });
     res.status(204).end();
   } catch (error) {
     console.error('Erreur updateProcedure:', error);
@@ -262,6 +271,8 @@ async function deleteProcedure(req, res) {
       }
 
       await conn.query(`DELETE FROM procedures WHERE id = ?`, [id]);
+      
+      await AuditService.log(req.user?.id, 'DELETE', 'procedure', id, { statut: currentStatut });
 
       await conn.commit();
       conn.release();
@@ -322,6 +333,19 @@ async function startApprovalWorkflow(req, res) {
     }
 
     await db.query(`UPDATE procedures SET statut = ? WHERE id = ?`, [STATUT_EN_REVISION, procedureId]);
+
+    // Créer notification pour le vérificateur
+    if (verifierId) {
+      const [[proc]] = await db.query('SELECT titre FROM procedures WHERE id = ?', [procedureId]);
+      await NotificationService.create(
+        verifierId,
+        'workflow',
+        'Nouvelle tâche assignée',
+        `Vous avez une nouvelle procédure à vérifier : "${proc.titre}"`,
+        'procedure',
+        procedureId
+      );
+    }
 
     res.status(201).json({ workflowId });
   } catch (error) {

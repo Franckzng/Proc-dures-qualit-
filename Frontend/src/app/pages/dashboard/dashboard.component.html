@@ -1,145 +1,211 @@
-<!-- src/app/pages/dashboard/dashboard.component.html -->
-<div class="dashboard container my-4" *ngIf="!loading; else loadingTpl">
-  <div class="row g-3">
-
-    <div class="col-12 d-flex justify-content-between align-items-center mb-2">
+<div class="modern-dashboard" *ngIf="!loading; else loadingTpl">
+  <!-- Header -->
+  <div class="dashboard-header">
+    <div class="header-content">
       <div>
-        <h3 class="mb-0">Tableau de bord</h3>
-        <small class="text-muted">
-          Dernière mise à jour :
-          <span *ngIf="summary?.updated_at; else dashNoUpdate">
-            {{ summary?.updated_at | date:'dd/MM/yyyy HH:mm' }}
-          </span>
-          <ng-template #dashNoUpdate>—</ng-template>
-        </small>
+        <h1>Tableau de bord</h1>
+        <p>Vue d'ensemble de votre système de gestion qualité</p>
       </div>
-
-      <div class="d-flex align-items-center">
-        <button *ngIf="isRedacteur()"
-          [routerLink]="['/dashboard','procedures','new']"
-          class="btn btn-primary me-2">
-          <i class="bi bi-plus-lg"></i> Nouvelle Procédure
+      <div class="header-actions">
+        <button [routerLink]="['/dashboard/search']" class="btn-action btn-secondary">
+          <i class="bi bi-search"></i>
+          <span>Recherche</span>
+        </button>
+        <button [routerLink]="['/dashboard/reports']" class="btn-action btn-info">
+          <i class="bi bi-graph-up"></i>
+          <span>Rapports</span>
+        </button>
+        <button *ngIf="isRedacteur()" [routerLink]="['/dashboard','procedures','new']" class="btn-action btn-primary">
+          <i class="bi bi-plus-circle"></i>
+          <span>Nouvelle Procédure</span>
         </button>
       </div>
     </div>
+  </div>
 
-    <!-- SUMMARY CARDS -->
-    <div class="col-lg-3 col-md-6">
-      <div class="card summary-card shadow-sm">
-        <div class="card-body d-flex align-items-center">
-          <div class="me-3 icon-wrap bg-light">
-            <i class="bi bi-collection-play fs-3 text-primary"></i>
-          </div>
-          <div>
-            <div class="text-muted small">Total procédures</div>
-            <div class="h4 mb-0">{{ niceNumber(totalProcedures) }}</div>
-          </div>
-        </div>
+  <!-- KPI Cards -->
+  <div class="kpi-section">
+    <div class="kpi-card total">
+      <div class="kpi-icon">
+        <i class="bi bi-collection"></i>
+      </div>
+      <div class="kpi-content">
+        <h2>{{ niceNumber(totalProcedures) }}</h2>
+        <p>Total Procédures</p>
+      </div>
+      <div class="kpi-trend">
+        <i class="bi bi-arrow-up"></i>
       </div>
     </div>
 
-    <div class="col-lg-3 col-md-6" *ngFor="let s of statusOrder">
-      <div class="card summary-card shadow-sm">
-        <div class="card-body d-flex align-items-center">
-          <div class="me-3 icon-wrap bg-light" [style.color]="s.color">
-            <i [class]="'bi ' + s.icon + ' fs-3'"></i>
-          </div>
-          <div>
-            <div class="text-muted small">{{ s.label }}</div>
-            <div class="h5 mb-0">
-              {{ s.key === 'APPROUVEE' ? niceNumber(countApproved)
-                 : s.key === 'PUBLIEE'   ? niceNumber(countPublished)
-                 : s.key === 'BROUILLON' ? niceNumber(countDraft)
-                 : s.key === 'REJETEE'   ? niceNumber(countRejected)
-                 : '0' }}
+    <div class="kpi-card approved">
+      <div class="kpi-icon">
+        <i class="bi bi-check-circle"></i>
+      </div>
+      <div class="kpi-content">
+        <h2>{{ niceNumber(countApproved) }}</h2>
+        <p>Approuvées</p>
+      </div>
+      <div class="kpi-progress">
+        <div class="progress-bar" [style.width]="percent(countApproved)"></div>
+      </div>
+    </div>
+
+    <div class="kpi-card published">
+      <div class="kpi-icon">
+        <i class="bi bi-broadcast"></i>
+      </div>
+      <div class="kpi-content">
+        <h2>{{ niceNumber(countPublished) }}</h2>
+        <p>Publiées</p>
+      </div>
+      <div class="kpi-progress">
+        <div class="progress-bar" [style.width]="percent(countPublished)"></div>
+      </div>
+    </div>
+
+    <div class="kpi-card draft" *ngIf="isRedacteur()">
+      <div class="kpi-icon">
+        <i class="bi bi-file-earmark"></i>
+      </div>
+      <div class="kpi-content">
+        <h2>{{ niceNumber(countDraft) }}</h2>
+        <p>Brouillons</p>
+      </div>
+      <div class="kpi-progress">
+        <div class="progress-bar" [style.width]="percent(countDraft)"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content Grid -->
+  <div class="content-grid">
+    <!-- Chart Card -->
+    <div class="chart-card">
+      <div class="card-header">
+        <h3><i class="bi bi-pie-chart"></i> Répartition par Statut</h3>
+      </div>
+      <div class="card-body">
+        <div class="status-bars">
+          <div class="status-bar" *ngFor="let s of statusOrder">
+            <div class="status-info">
+              <div class="status-label">
+                <i [class]="'bi ' + s.icon" [style.color]="s.color"></i>
+                <span>{{ s.label }}</span>
+              </div>
+              <strong>{{ s.key === 'APPROUVEE' ? niceNumber(countApproved)
+                         : s.key === 'PUBLIEE' ? niceNumber(countPublished)
+                         : s.key === 'BROUILLON' ? niceNumber(countDraft)
+                         : s.key === 'REJETEE' ? niceNumber(countRejected) : '0' }}</strong>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill" 
+                   [style.width]="s.key === 'APPROUVEE' ? percent(countApproved)
+                                  : s.key === 'PUBLIEE' ? percent(countPublished)
+                                  : s.key === 'BROUILLON' ? percent(countDraft)
+                                  : s.key === 'REJETEE' ? percent(countRejected) : '0%'"
+                   [style.background]="s.color"></div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- CHART -->
-    <div class="col-lg-6">
-      <div class="card shadow-sm chart-card h-100">
-        <div class="card-body">
-          <h6 class="card-title">Répartition par statut</h6>
-
-          <div class="chart-bars">
-            <div class="bar-row" *ngFor="let s of statusOrder">
-              <div class="bar-label">
-                <i [class]="'bi ' + s.icon"></i>
-                <span class="ms-2">{{ s.label }}</span>
-              </div>
-
-              <div class="bar-track">
-                <div class="bar-fill"
-                     [ngStyle]="{
-                       'width': (s.key === 'APPROUVEE' ? percent(countApproved)
-                                : s.key === 'PUBLIEE' ? percent(countPublished)
-                                : s.key === 'BROUILLON' ? percent(countDraft)
-                                : s.key === 'REJETEE' ? percent(countRejected)
-                                : '0%'),
-                       'background': s.color
-                     }"></div>
-              </div>
-
-              <div class="bar-value">
-                {{ s.key === 'APPROUVEE' ? niceNumber(countApproved)
-                   : s.key === 'PUBLIEE'   ? niceNumber(countPublished)
-                   : s.key === 'BROUILLON' ? niceNumber(countDraft)
-                   : s.key === 'REJETEE'   ? niceNumber(countRejected)
-                   : '0' }}
-              </div>
+    <!-- Recent Procedures -->
+    <div class="recent-card">
+      <div class="card-header">
+        <h3><i class="bi bi-clock-history"></i> Procédures Récentes</h3>
+        <span class="badge">{{ recentProcedures.length }}</span>
+      </div>
+      <div class="card-body">
+        <div class="recent-list">
+          <div class="recent-item" *ngFor="let p of recentProcedures">
+            <div class="recent-icon" [ngClass]="getStatusClass(p.statut)">
+              <i class="bi bi-file-earmark-text"></i>
+            </div>
+            <div class="recent-content">
+              <h4>{{ p.titre }}</h4>
+              <p>{{ p.date_creation | date:'dd/MM/yyyy HH:mm' }}</p>
+            </div>
+            <div class="recent-actions">
+              <span class="badge" [ngClass]="getStatusBadge(p.statut)">{{ p.statut }}</span>
+              <button [routerLink]="['/dashboard/procedures', p.id]" class="btn-view">
+                <i class="bi bi-arrow-right"></i>
+              </button>
             </div>
           </div>
-
+          <div class="empty-state" *ngIf="recentProcedures.length === 0">
+            <i class="bi bi-inbox"></i>
+            <p>Aucune procédure récente</p>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- RECENT PROCEDURES -->
-    <div class="col-lg-6">
-      <div class="card shadow-sm h-100">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <strong>Procédures récentes</strong>
-          <small class="text-muted">{{ recentProcedures.length }} items</small>
+    <!-- Quick Actions -->
+    <div class="actions-card">
+      <div class="card-header">
+        <h3><i class="bi bi-lightning"></i> Actions Rapides</h3>
+      </div>
+      <div class="card-body">
+        <div class="quick-actions">
+          <a [routerLink]="['/dashboard/procedures']" class="action-btn">
+            <i class="bi bi-list-ul"></i>
+            <span>Voir toutes les procédures</span>
+          </a>
+          <a [routerLink]="['/dashboard/search']" class="action-btn">
+            <i class="bi bi-search"></i>
+            <span>Recherche avancée</span>
+          </a>
+          <a [routerLink]="['/dashboard/workflows/pending']" class="action-btn" *ngIf="canSeeTasks()">
+            <i class="bi bi-list-task"></i>
+            <span>Mes tâches en attente</span>
+          </a>
+          <a [routerLink]="['/dashboard/reports']" class="action-btn">
+            <i class="bi bi-graph-up"></i>
+            <span>Consulter les rapports</span>
+          </a>
         </div>
-
-        <ul class="list-group list-group-flush recent-list">
-          <li class="list-group-item d-flex justify-content-between align-items-start"
-              *ngFor="let p of recentProcedures">
-            <div class="me-3">
-              <div class="fw-semibold">{{ p.titre }}</div>
-              <div class="text-muted small">Créé : {{ p.date_creation | date:'dd/MM/yyyy HH:mm' }}</div>
-            </div>
-
-            <div class="text-end">
-              <span class="badge"
-                    [ngClass]="{
-                      'bg-success': p.statut === 'APPROUVEE',
-                      'bg-primary': p.statut === 'PUBLIEE',
-                      'bg-secondary': p.statut === 'BROUILLON',
-                      'bg-danger': p.statut === 'REJETEE'
-                    }">{{ p.statut }}</span>
-              <div class="mt-1">
-                <a [routerLink]="['/dashboard/procedures', p.id]" class="btn btn-sm btn-outline-primary">Voir</a>
-              </div>
-            </div>
-          </li>
-
-          <li class="list-group-item text-center text-muted" *ngIf="recentProcedures.length === 0">
-            Aucune procédure récente
-          </li>
-        </ul>
       </div>
     </div>
 
+    <!-- System Info -->
+    <div class="info-card">
+      <div class="card-header">
+        <h3><i class="bi bi-info-circle"></i> Informations Système</h3>
+      </div>
+      <div class="card-body">
+        <div class="info-list">
+          <div class="info-item">
+            <i class="bi bi-calendar-check"></i>
+            <div>
+              <strong>Dernière mise à jour</strong>
+              <p>{{ summary?.updated_at | date:'dd/MM/yyyy HH:mm' }}</p>
+            </div>
+          </div>
+          <div class="info-item">
+            <i class="bi bi-arrow-repeat"></i>
+            <div>
+              <strong>Workflows en cours</strong>
+              <p>{{ summary?.workflowsInProgress || 0 }} actifs</p>
+            </div>
+          </div>
+          <div class="info-item">
+            <i class="bi bi-bell"></i>
+            <div>
+              <strong>Notifications</strong>
+              <p>{{ summary?.pendingForUser || 0 }} non lues</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
 <ng-template #loadingTpl>
-  <div class="d-flex justify-content-center align-items-center py-5">
-    <div class="spinner-border text-primary me-3" role="status" aria-hidden="true"></div>
-    <div>Chargement du tableau de bord…</div>
+  <div class="loading-state">
+    <div class="spinner-border text-primary"></div>
+    <p>Chargement du tableau de bord...</p>
   </div>
 </ng-template>

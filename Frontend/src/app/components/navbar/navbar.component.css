@@ -1,0 +1,146 @@
+.notification-dropdown {
+  width: 380px;
+  max-height: 500px;
+  overflow: hidden;
+  padding: 0;
+}
+
+.notification-header {
+  padding: 15px 20px;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f8f9fa;
+}
+
+.notification-header h6 {
+  margin: 0;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.notification-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.notification-item {
+  padding: 15px 20px;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  gap: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.notification-item:hover {
+  background: #f7fafc;
+}
+
+.notification-item.unread {
+  background: #ebf8ff;
+}
+
+.notification-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #667eea;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.notification-icon i {
+  color: white;
+  font-size: 18px;
+}
+
+.notification-content {
+  flex: 1;
+}
+
+.notification-content strong {
+  display: block;
+  color: #2d3748;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.notification-content p {
+  margin: 0;
+  color: #4a5568;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.notification-content small {
+  color: #a0aec0;
+  font-size: 12px;
+}
+
+/* Navbar moderne */
+.navbar {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+  padding: 0.75rem 1rem;
+}
+
+.navbar-brand {
+  font-weight: 700;
+  font-size: 1.25rem;
+  letter-spacing: -0.5px;
+}
+
+.nav-link {
+  font-weight: 500;
+  transition: all 0.3s;
+  border-radius: 8px;
+  padding: 0.5rem 1rem !important;
+  margin: 0 0.25rem;
+}
+
+.nav-link:hover {
+  background: rgba(255,255,255,0.15);
+  transform: translateY(-1px);
+}
+
+.nav-link.active {
+  background: rgba(255,255,255,0.2);
+}
+
+.dropdown-menu {
+  border: none;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+  border-radius: 12px;
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.dropdown-item {
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  transition: all 0.2s;
+}
+
+.dropdown-item:hover {
+  background: #f7fafc;
+  transform: translateX(4px);
+}
+
+.dropdown-divider {
+  margin: 0.5rem 0;
+}
+
+.btn-outline-light {
+  border: 2px solid rgba(255,255,255,0.3);
+  transition: all 0.3s;
+}
+
+.btn-outline-light:hover {
+  background: rgba(255,255,255,0.2);
+  border-color: rgba(255,255,255,0.5);
+  transform: translateY(-2px);
+}

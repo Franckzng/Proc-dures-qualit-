@@ -1,0 +1,93 @@
+<div class="audit-container">
+  <div class="audit-header">
+    <h2><i class="bi bi-shield-check"></i> Logs d'Audit</h2>
+    <p>Traçabilité complète des actions système</p>
+  </div>
+
+  <div class="audit-filters">
+    <div class="row g-3">
+      <div class="col-md-3">
+        <label class="form-label">Type d'entité</label>
+        <select class="form-select" [(ngModel)]="filters.entityType">
+          <option value="">Tous les types</option>
+          <option *ngFor="let type of entityTypes" [value]="type">{{ type }}</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Date début</label>
+        <input type="date" class="form-control" [(ngModel)]="filters.startDate">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">Date fin</label>
+        <input type="date" class="form-control" [(ngModel)]="filters.endDate">
+      </div>
+      <div class="col-md-3">
+        <label class="form-label">&nbsp;</label>
+        <button class="btn btn-primary w-100" (click)="loadLogs()">
+          <i class="bi bi-funnel"></i> Filtrer
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="audit-stats">
+    <div class="stat-card">
+      <i class="bi bi-list-ul"></i>
+      <div>
+        <h4>{{ logs().length }}</h4>
+        <p>Logs affichés</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="audit-logs">
+    <div *ngIf="loading()" class="text-center py-5">
+      <div class="spinner-border text-primary"></div>
+    </div>
+
+    <div *ngIf="!loading()" class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Date/Heure</th>
+            <th>Utilisateur</th>
+            <th>Action</th>
+            <th>Type</th>
+            <th>ID Entité</th>
+            <th>IP</th>
+            <th>Détails</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let log of logs()">
+            <td>{{ formatDate(log.created_at) }}</td>
+            <td>
+              <span *ngIf="log.nom">{{ log.prenom }} {{ log.nom }}</span>
+              <span *ngIf="!log.nom" class="text-muted">Système</span>
+            </td>
+            <td>
+              <span class="badge" [ngClass]="getActionBadge(log.action)">
+                {{ log.action }}
+              </span>
+            </td>
+            <td>{{ log.entity_type }}</td>
+            <td>{{ log.entity_id || '-' }}</td>
+            <td><small class="text-muted">{{ log.ip_address || '-' }}</small></td>
+            <td>
+              <button class="btn btn-sm btn-outline-secondary" 
+                      *ngIf="log.details"
+                      title="Voir détails">
+                <i class="bi bi-eye"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div *ngIf="!loading() && logs().length === 0" class="no-logs">
+      <i class="bi bi-inbox"></i>
+      <p>Aucun log trouvé pour cette période</p>
+    </div>
+  </div>
+</div>

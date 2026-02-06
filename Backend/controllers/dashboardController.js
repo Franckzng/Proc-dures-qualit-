@@ -8,15 +8,43 @@ const db = require('../config/db');
 exports.getSummary = async (req, res, next) => {
   try {
     const userId = req.user?.id || null;
+    const roleId = req.user?.role_id || null;
 
-    // total procédures
-    const [totalRows] = await db.query(`SELECT COUNT(*) AS total FROM procedures`);
+    // total procédures (selon rôle)
+    let totalSql = 'SELECT COUNT(*) AS total FROM procedures';
+    let totalParams = [];
+    
+    if (roleId === 4) { // Rédacteur
+      totalSql += ' WHERE redacteur_id = ?';
+      totalParams = [userId];
+    } else if (roleId === 3) { // Vérificateur
+      totalSql += " WHERE statut IN ('EN_REVISION', 'EN_APPROBATION', 'APPROUVEE')";
+    } else if (roleId === 2) { // Approbateur
+      totalSql += " WHERE statut IN ('EN_APPROBATION', 'APPROUVEE')";
+    } else if (roleId === 5) { // Utilisateur simple
+      totalSql += " WHERE statut = 'APPROUVEE'";
+    }
+    
+    const [totalRows] = await db.query(totalSql, totalParams);
     const total = Number(totalRows[0]?.total || 0);
 
-    // répartition par statut
-    const [byStatusRows] = await db.query(
-      `SELECT statut, COUNT(*) AS count FROM procedures GROUP BY statut`
-    );
+    // répartition par statut (selon rôle)
+    let statusSql = 'SELECT statut, COUNT(*) AS count FROM procedures';
+    let statusParams = [];
+    
+    if (roleId === 4) {
+      statusSql += ' WHERE redacteur_id = ?';
+      statusParams = [userId];
+    } else if (roleId === 3) {
+      statusSql += " WHERE statut IN ('EN_REVISION', 'EN_APPROBATION', 'APPROUVEE')";
+    } else if (roleId === 2) {
+      statusSql += " WHERE statut IN ('EN_APPROBATION', 'APPROUVEE')";
+    } else if (roleId === 5) {
+      statusSql += " WHERE statut = 'APPROUVEE'";
+    }
+    
+    statusSql += ' GROUP BY statut';
+    const [byStatusRows] = await db.query(statusSql, statusParams);
 
     // workflows en cours
     const [wfRows] = await db.query(
@@ -40,15 +68,26 @@ exports.getSummary = async (req, res, next) => {
     );
     const pendingCountGlobal = Number(pendingGlobalRows[0]?.pending || 0);
 
-    // procédures récentes (limitées)
-    const [recentProcedures] = await db.query(
-      `SELECT p.id, p.titre, p.statut, p.date_creation,
-              u.id AS redacteur_id, CONCAT(u.prenom, ' ', u.nom) AS redacteur_name
-         FROM procedures p
-         LEFT JOIN utilisateurs u ON u.id = p.redacteur_id
-        ORDER BY p.date_creation DESC
-        LIMIT 8`
-    );
+    // procédures récentes (selon rôle)
+    let recentSql = `SELECT p.id, p.titre, p.statut, p.date_creation,
+            u.id AS redacteur_id, CONCAT(u.prenom, ' ', u.nom) AS redacteur_name
+       FROM procedures p
+       LEFT JOIN utilisateurs u ON u.id = p.redacteur_id`;
+    let recentParams = [];
+    
+    if (roleId === 4) {
+      recentSql += ' WHERE p.redacteur_id = ?';
+      recentParams = [userId];
+    } else if (roleId === 3) {
+      recentSql += " WHERE p.statut IN ('EN_REVISION', 'EN_APPROBATION', 'APPROUVEE')";
+    } else if (roleId === 2) {
+      recentSql += " WHERE p.statut IN ('EN_APPROBATION', 'APPROUVEE')";
+    } else if (roleId === 5) {
+      recentSql += " WHERE p.statut = 'APPROUVEE'";
+    }
+    
+    recentSql += ' ORDER BY p.date_creation DESC LIMIT 8';
+    const [recentProcedures] = await db.query(recentSql, recentParams);
 
     const updated_at = new Date().toISOString();
 

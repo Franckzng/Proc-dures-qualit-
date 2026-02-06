@@ -6,6 +6,8 @@ const bodyParser = require('body-parser');
 const multer     = require('multer');
 const crypto     = require('crypto');
 const path       = require('path');
+const swaggerUi  = require('swagger-ui-express');
+const swaggerDoc = require('./swagger.json');
 const { sequelize } = require('./models');
 
 const authMiddleware    = require('./middlewares/authMiddleware');
@@ -13,12 +15,16 @@ const verifyToken       = authMiddleware.verifyToken || authMiddleware;
 
 const authRoutes        = require('./routes/authRoutes');
 const userRoutes        = require('./routes/userRoutes');
-// departmentRoutes intentionally removed
 const procedureRoutes   = require('./routes/procedureRoutes');
 const workflowRoutes    = require('./routes/workflowRoutes');
 const attachmentRoutes  = require('./routes/attachmentRoutes');
 const dashboardRoutes   = require('./routes/dashboardRoutes');
 const normeRoutes       = require('./routes/normeRoutes');
+const auditRoutes       = require('./routes/auditRoutes');
+const notificationRoutes= require('./routes/notificationRoutes');
+const searchRoutes      = require('./routes/searchRoutes');
+const reportRoutes      = require('./routes/reportRoutes');
+const versionRoutes     = require('./routes/versionRoutes');
 
 const app = express();
 
@@ -43,6 +49,8 @@ app.use((req, res, next) => {
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
+
 app.use('/api', (req, res, next) => {
   if (req.originalUrl.startsWith('/api/auth')) return next();
   return verifyToken(req, res, next);
@@ -53,13 +61,18 @@ sequelize.authenticate()
   .catch(err => console.error('❌ DB connection error:', err));
 
 // Routes
-app.use('/api/auth',        authRoutes);
-app.use('/api/users',       userRoutes);
-app.use('/api/procedures',  procedureRoutes);
-app.use('/api/workflows',   workflowRoutes);
-app.use('/api/attachments', attachmentRoutes);
-app.use('/api/dashboard',   dashboardRoutes);
-app.use('/api/normes',      normeRoutes);
+app.use('/api/auth',          authRoutes);
+app.use('/api/users',         userRoutes);
+app.use('/api/procedures',    procedureRoutes);
+app.use('/api/workflows',     workflowRoutes);
+app.use('/api/attachments',   attachmentRoutes);
+app.use('/api/dashboard',     dashboardRoutes);
+app.use('/api/normes',        normeRoutes);
+app.use('/api/audit',         auditRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/search',        searchRoutes);
+app.use('/api/reports',       reportRoutes);
+app.use('/api/versions',      versionRoutes);
 
 app.use((err, req, res, next) => {
   if (err && err instanceof multer.MulterError) {
